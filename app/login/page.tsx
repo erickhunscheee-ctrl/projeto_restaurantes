@@ -4,7 +4,6 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { User, Smartphone } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { createClient } from "@/lib/supabase/client";
 
 export default function LoginPage() {
   const router = useRouter();
@@ -21,19 +20,20 @@ export default function LoginPage() {
     setLoading(true);
     setErro(null);
 
-    const supabase = createClient();
     const phone = `+55${telefone.replace(/\D/g, "")}`;
 
     // Envia o código OTP por SMS. A confirmação acontece numa segunda tela
     // (ex: /login/confirmar) que ainda precisa ser implementada.
-    const { error } = await supabase.auth.signInWithOtp({
-      phone,
-      options: { data: { nome: nome.trim() } },
+    const response = await fetch("/api/auth/request-code", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ telefone: phone, nome: nome.trim() }),
     });
+    const result = await response.json();
 
     setLoading(false);
-    if (error) {
-      setErro(error.message);
+    if (!response.ok) {
+      setErro(result.error ?? "Não foi possível enviar o código.");
       return;
     }
     router.push(`/login/confirmar?telefone=${encodeURIComponent(phone)}&nome=${encodeURIComponent(nome)}`);

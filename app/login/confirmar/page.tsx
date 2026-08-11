@@ -19,23 +19,30 @@ export default function ConfirmarLoginPage({
   async function handleConfirmar() {
     setLoading(true);
     setErro(null);
-    const supabase = createClient();
-
-    const { data, error } = await supabase.auth.verifyOtp({
-      phone: telefone,
-      token: codigo,
-      type: "sms",
+    const response = await fetch("/api/auth/verify-code", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ telefone, codigo }),
     });
+    const result = await response.json();
 
-    if (error || !data.user) {
+    if (!response.ok || !result.session) {
       setLoading(false);
-      setErro(error?.message ?? "Código inválido.");
+      setErro(result.error ?? "Código inválido.");
+      return;
+    }
+
+    const supabase = createClient();
+    const { error: sessionError } = await supabase.auth.setSession(result.session);
+    if (sessionError) {
+      setLoading(false);
+      setErro(sessionError.message);
       return;
     }
 
     // Garante que o perfil (nome + telefone) existe na tabela `profiles`.
     await supabase.from("profiles").upsert({
-      id: data.user.id,
+      id: result.userId,
       nome,
       telefone,
     });

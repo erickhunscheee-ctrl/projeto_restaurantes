@@ -15,12 +15,14 @@ export default function AdminLoginPage() {
     if (digits.length < 10 || !nome.trim()) return setErro("Informe seu nome e um telefone válido.");
     setLoading(true); setErro(null);
     const phone = `+55${digits}`;
-    const { error } = await createClient().auth.signInWithOtp({
-      phone,
-      options: { data: { nome: nome.trim() } },
+    const response = await fetch("/api/auth/request-code", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ telefone: phone, nome: nome.trim() }),
     });
+    const result = await response.json();
     setLoading(false);
-    if (error) return setErro(error.message);
+    if (!response.ok) return setErro(result.error ?? "Não foi possível enviar o código.");
     router.push(`/admin/login/confirmar?telefone=${encodeURIComponent(phone)}&nome=${encodeURIComponent(nome)}`);
   }
   return <main className="flex flex-1 flex-col justify-center gap-3 px-6">
