@@ -4,8 +4,8 @@ import "./globals.css";
 import { Providers } from "./providers";
 
 export const metadata: Metadata = {
-  title: "Marmita Já",
-  description: "Sua marmita caseira, todo dia",
+  title: "Rango",
+  description: "Qual seu Rango de hoje?",
 };
 
 export default function RootLayout({ children }: { children: ReactNode }) {
