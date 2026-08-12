@@ -81,6 +81,13 @@ export type Address = {
   endereco: string;
   padrao: boolean;
   criado_em: string;
+  cep: string | null;
+  numero: string | null;
+  bairro: string | null;
+  cidade: string | null;
+  estado: string | null;
+  latitude: number | null;
+  longitude: number | null;
 };
 
 // Item de carrinho local (antes de virar Order/OrderItem no banco)

@@ -1,61 +1,21 @@
 @import "tailwindcss";
 
-@font-face {
-  font-family: "PolySans";
-  src:
-    local("PolySans Light"),
-    local("PolySans-Light"),
-    url("/fonts/PolySans-Light.woff2") format("woff2");
-  font-display: swap;
-  font-style: normal;
-  font-weight: 300;
-}
-
-@font-face {
-  font-family: "PolySans";
-  src:
-    local("PolySans Regular"),
-    local("PolySans-Regular"),
-    url("/fonts/PolySans-Regular.woff2") format("woff2");
-  font-display: swap;
-  font-style: normal;
-  font-weight: 400;
-}
-
-@font-face {
-  font-family: "PolySans";
-  src:
-    local("PolySans SemiBold"),
-    local("PolySans-SemiBold"),
-    url("/fonts/PolySans-SemiBold.woff2") format("woff2");
-  font-display: swap;
-  font-style: normal;
-  font-weight: 600;
-}
-
-@font-face {
-  font-family: "PolySans";
-  src:
-    local("PolySans Bold"),
-    local("PolySans-Bold"),
-    url("/fonts/PolySans-Bold.woff2") format("woff2");
-  font-display: swap;
-  font-style: normal;
-  font-weight: 700;
-}
-
 :root {
-  --color-primary-500: #F55905;
-  --color-primary-600: #CF4409;
-  --color-primary-700: #A23608;
-  --color-primary-800: #8A2F07;
-  --color-neutral-900: #1E1E1E;
-  --color-neutral-050: #F7F7F7;
-  --color-neutral-000: #FFFFFF;
-  --color-neutral-700: #505050;
-  --color-neutral-500: #737373;
-  --color-neutral-300: #BDBDBD;
-  --color-neutral-200: #E2E2E2;
+  --ds-primary-500: #F55905;
+  --ds-primary-600: #CF4409;
+  --ds-primary-700: #A23608;
+  --ds-primary-800: #8A2F07;
+
+  --ds-neutral-900: #1E1E1E;
+  --ds-neutral-700: #505050;
+  --ds-neutral-500: #737373;
+  --ds-neutral-300: #BDBDBD;
+  --ds-neutral-200: #E2E2E2;
+  --ds-neutral-050: #F7F7F7;
+  --ds-neutral-000: #FFFFFF;
+
+  --ds-primary-tint: #FFF0E9;
+  --ds-border-strong: #CFCFCF;
 
   --font-family-primary: "PolySans", Arial, Helvetica, sans-serif;
   --font-size-heading-1: 28px;
@@ -64,22 +24,21 @@
   --font-size-body-small: 14px;
   --font-size-caption: 12px;
 
-  --background: var(--color-neutral-050);
-  --foreground: var(--color-neutral-900);
+  /* Aliases semânticos preservados para os componentes existentes. */
+  --background: var(--ds-neutral-050);
+  --foreground: var(--ds-neutral-900);
   --font-polysans: var(--font-family-primary);
-
-  /* Aliases semânticos usados pelos componentes existentes. */
-  --color-red: var(--color-primary-500);
-  --color-red-dark: var(--color-primary-700);
-  --color-red-tint: #FFF0E9;
-  --color-green: var(--color-primary-800);
+  --color-red: var(--ds-primary-500);
+  --color-red-dark: var(--ds-primary-700);
+  --color-red-tint: var(--ds-primary-tint);
+  --color-green: var(--ds-primary-800);
   --color-green-tint: #FFF4EF;
-  --color-ink: var(--color-neutral-900);
-  --color-ink-soft: var(--color-neutral-500);
-  --color-ink-faint: var(--color-neutral-300);
-  --color-border: var(--color-neutral-200);
-  --color-border-strong: #CFCFCF;
-  --color-bg: var(--color-neutral-050);
+  --color-ink: var(--ds-neutral-900);
+  --color-ink-soft: var(--ds-neutral-500);
+  --color-ink-faint: var(--ds-neutral-300);
+  --color-border: var(--ds-neutral-200);
+  --color-border-strong: var(--ds-border-strong);
+  --color-bg: var(--ds-neutral-050);
 }
 
 @theme inline {
@@ -87,13 +46,17 @@
   --color-foreground: var(--foreground);
   --font-sans: var(--font-polysans);
 
-  --color-primary-500: var(--color-primary-500);
-  --color-primary-600: var(--color-primary-600);
-  --color-primary-700: var(--color-primary-700);
-  --color-primary-800: var(--color-primary-800);
-  --color-neutral-900: var(--color-neutral-900);
-  --color-neutral-050: var(--color-neutral-050);
-  --color-neutral-000: var(--color-neutral-000);
+  --color-primary-500: var(--ds-primary-500);
+  --color-primary-600: var(--ds-primary-600);
+  --color-primary-700: var(--ds-primary-700);
+  --color-primary-800: var(--ds-primary-800);
+  --color-neutral-900: var(--ds-neutral-900);
+  --color-neutral-700: var(--ds-neutral-700);
+  --color-neutral-500: var(--ds-neutral-500);
+  --color-neutral-300: var(--ds-neutral-300);
+  --color-neutral-200: var(--ds-neutral-200);
+  --color-neutral-050: var(--ds-neutral-050);
+  --color-neutral-000: var(--ds-neutral-000);
 
   --color-red: var(--color-red);
   --color-red-dark: var(--color-red-dark);
@@ -108,6 +71,10 @@
   --color-bg: var(--color-bg);
 }
 
+* {
+  box-sizing: border-box;
+}
+
 body {
   background: var(--background);
   color: var(--foreground);
@@ -115,11 +82,30 @@ body {
   font-weight: 400;
 }
 
-/* Escala tipográfica PolySans Regular */
-.type-light-28 {
-  font-size: 28px;
-  line-height: 34px;
-  font-weight: 300;
+.type-heading-1,
+.type-heading-2,
+.type-body-emphasis,
+.type-body,
+.type-body-small,
+.type-label,
+.type-caption,
+.type-caption-light,
+.type-light-28,
+.type-light-24,
+.type-light-16,
+.type-light-14,
+.type-light-12,
+.type-normal-28,
+.type-normal-24,
+.type-normal-16,
+.type-normal-14,
+.type-normal-12,
+.type-semibold-28,
+.type-semibold-24,
+.type-semibold-16,
+.type-semibold-14,
+.type-semibold-12 {
+  font-family: var(--font-family-primary);
 }
 
 .type-heading-1 {
@@ -158,99 +144,75 @@ body {
   font-weight: 600;
 }
 
-.type-caption {
+.type-caption,
+.type-caption-light {
   font-size: var(--font-size-caption);
   line-height: 16px;
+}
+
+.type-caption {
   font-weight: 400;
 }
 
 .type-caption-light {
-  font-size: var(--font-size-caption);
-  line-height: 16px;
   font-weight: 300;
 }
 
-.type-light-24 {
-  font-size: 24px;
-  line-height: 30px;
-  font-weight: 300;
-}
-
-.type-light-16 {
-  font-size: 16px;
-  line-height: 22px;
-  font-weight: 300;
-}
-
-.type-light-14 {
-  font-size: 14px;
-  line-height: 20px;
-  font-weight: 300;
-}
-
+.type-light-28,
+.type-light-24,
+.type-light-16,
+.type-light-14,
 .type-light-12 {
-  font-size: 12px;
-  line-height: 16px;
   font-weight: 300;
 }
 
-.type-normal-28 {
-  font-size: 28px;
-  line-height: 34px;
-  font-weight: 400;
-}
-
-.type-normal-24 {
-  font-size: 24px;
-  line-height: 30px;
-  font-weight: 400;
-}
-
-.type-normal-16 {
-  font-size: 16px;
-  line-height: 22px;
-  font-weight: 400;
-}
-
-.type-normal-14 {
-  font-size: 14px;
-  line-height: 20px;
-  font-weight: 400;
-}
-
-.type-normal-12 {
-  font-size: 12px;
-  line-height: 16px;
-  font-weight: 400;
-}
-
-/* Escala tipográfica PolySans SemiBold */
+.type-light-28,
+.type-normal-28,
 .type-semibold-28 {
   font-size: 28px;
   line-height: 34px;
-  font-weight: 600;
 }
 
+.type-light-24,
+.type-normal-24,
 .type-semibold-24 {
   font-size: 24px;
   line-height: 30px;
-  font-weight: 600;
 }
 
+.type-light-16,
+.type-normal-16,
 .type-semibold-16 {
   font-size: 16px;
   line-height: 22px;
-  font-weight: 600;
 }
 
+.type-light-14,
+.type-normal-14,
 .type-semibold-14 {
   font-size: 14px;
   line-height: 20px;
-  font-weight: 600;
 }
 
+.type-light-12,
+.type-normal-12,
 .type-semibold-12 {
   font-size: 12px;
   line-height: 16px;
+}
+
+.type-normal-28,
+.type-normal-24,
+.type-normal-16,
+.type-normal-14,
+.type-normal-12 {
+  font-weight: 400;
+}
+
+.type-semibold-28,
+.type-semibold-24,
+.type-semibold-16,
+.type-semibold-14,
+.type-semibold-12 {
   font-weight: 600;
 }

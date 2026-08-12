@@ -19,8 +19,10 @@ export async function middleware(request: NextRequest) {
   const { data: { user } } = await supabase.auth.getUser();
   if (request.nextUrl.pathname.startsWith("/admin") && !request.nextUrl.pathname.startsWith("/admin/login")) {
     if (!user) return NextResponse.redirect(new URL("/admin/login", request.url));
-    const { data: establishment } = await supabase.from("establishments").select("id").eq("owner_id", user.id).maybeSingle();
-    if (!establishment) return NextResponse.redirect(new URL("/admin/login", request.url));
+    const adminEmail = process.env.ADMIN_EMAIL ?? "admin@auth.marmita-ja.local";
+    if (user.email !== adminEmail || user.user_metadata?.platform_admin !== true) {
+      return NextResponse.redirect(new URL("/restaurantes", request.url));
+    }
   }
   return response;
 }

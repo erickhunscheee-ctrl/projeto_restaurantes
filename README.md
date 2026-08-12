@@ -28,6 +28,10 @@ inicia a sessão.
 Configure no servidor `SUPABASE_SERVICE_ROLE_KEY`, `WHATSAPP_API_KEY`,
 `WHATSAPP_API_URL` e `WHATSAPP_TELEFONE_ORIGEM`.
 
+O acesso ao painel administrativo usa `ADMIN_USUARIO` e `ADMIN_SENHA` definidos
+somente no servidor. `ADMIN_EMAIL` identifica a conta técnica criada no
+Supabase para manter a sessão administrativa.
+
 Em produção, use HTTPS também na API do WhatsApp para não transmitir a
 `X-API-Key` em texto claro.
 

@@ -3,6 +3,7 @@ import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
 import type { Establishment } from "@/lib/types";
 import { BottomNavbar } from "@/components/bottom-navbar";
+import { DeliveryAddress } from "@/components/delivery-address";
 
 export default async function RestaurantesPage() {
   const supabase = await createClient();
@@ -14,25 +15,35 @@ export default async function RestaurantesPage() {
   const lista = (establishments ?? []) as Establishment[];
 
   return (
-    <main className="flex flex-1 flex-col">
-      <div className="flex items-center gap-3 border-b border-border px-5 py-4">
-        <Link href="/"><ArrowLeft size={19} /></Link>
-        <span className="flex-1 text-base font-medium">Restaurantes</span>
-        <Link href="/perfil" aria-label="Meu perfil" className="flex h-8 w-8 items-center justify-center rounded-full bg-green-tint text-green">
-          <User size={17} />
-        </Link>
+    <main className="flex flex-1 flex-col bg-neutral-050">
+      <div className="flex items-center gap-3 px-5 py-4">
+        <button aria-label="Notificações" className="flex h-10 w-10 items-center justify-center rounded-full border border-white bg-neutral-000">
+          <img src="/icons/delivery.png" alt="" className="h-5 w-5 object-contain" />
+        </button>
+        <DeliveryAddress />
+        <button aria-label="Notificações" className="flex h-10 w-10 items-center justify-center rounded-full border border-white bg-neutral-000">
+          <img src="/icons/sino.png" alt="" className="h-4 w-4 object-contain" />
+        </button>
+        <button aria-label="Carrinho" className="flex h-10 w-10 items-center justify-center rounded-full border border-white bg-neutral-000">
+          <img src="/icons/basket.png" alt="" className="h-5 w-5 object-contain" />
+        </button>
       </div>
       <div className="flex gap-1 px-5 pt-3.5">
-        <p className="opacity-50">Qual</p>
+        <p className="opacity-50">Qual seu</p>
         <p className="font-bold">Rango</p>
-        <p className="opacity-50">você vai</p>
-        <p className="font-bold">Hoje?</p>
+        <p className="opacity-50">Hoje?</p>
       </div>
-      <div className="px-5 pt-3.5">
-        <div className="flex items-center gap-2 rounded-xl border border-border bg-neutral-000 px-3.5 py-2.5">
+      <div className="flex gap-3 px-5 pt-3.5">
+        <div className="flex flex-1 items-center gap-2 rounded-3xl border border-border bg-neutral-000 px-3.5 py-2.5">
           <Search size={18} className="text-ink-soft" />
-          <span className="text-sm text-ink-faint">Buscar por nome ou tipo de comida</span>
+          <span className="text-sm text-ink-faint">
+            Buscar por nome ou tipo de comida
+          </span>
         </div>
+
+        <button aria-label="Filtrar" className="flex h-10 w-10 items-center justify-center">
+          <img src="/icons/filtro.png" alt="" className="h-full w-full object-contain" />
+        </button>
       </div>
 
       <div className="px-5 pt-4">
@@ -54,11 +65,8 @@ export default async function RestaurantesPage() {
             <Link
               key={r.id}
               href={fechado ? "#" : `/restaurantes/${r.id}`}
-              className={`flex items-center gap-3 rounded-2xl border border-border p-2.5 ${fechado ? "pointer-events-none opacity-55" : ""
-                }`}
-            >
-              <div
-                className="flex h-14 w-14 shrink-0 items-center justify-center overflow-hidden rounded-xl"
+              className={`flex items-center gap-3 rounded-2xl border border-border p-2.5 ${fechado ? "pointer-events-none opacity-55" : "" }`}>
+              <div className="flex h-14 w-14 shrink-0 items-center justify-center overflow-hidden rounded-xl"
                 style={{
                   background: r.foto_url
                     ? `url(${r.foto_url}) center/cover`

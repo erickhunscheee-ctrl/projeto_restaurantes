@@ -55,7 +55,7 @@ export default function ConfirmarLoginPage({
     <main className="flex flex-1 flex-col justify-center px-6">
       <p className="text-center text-lg font-medium">Confirme seu código</p>
       <p className="mt-1.5 text-center text-sm text-ink-soft">
-        Enviamos um SMS para {telefone}
+        Enviamos um código para {telefone} via WhatsApp.
       </p>
 
       <div className="mt-6">
