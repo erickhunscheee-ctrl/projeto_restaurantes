@@ -1,14 +1,7 @@
 import type { Metadata } from "next";
 import type { ReactNode } from "react";
-import { Inter } from "next/font/google";
 import "./globals.css";
 import { Providers } from "./providers";
-
-const inter = Inter({
-  variable: "--font-inter",
-  subsets: ["latin"],
-  weight: ["400", "500", "600"],
-});
 
 export const metadata: Metadata = {
   title: "Marmita Já",
@@ -17,7 +10,7 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: { children: ReactNode }) {
   return (
-    <html lang="pt-BR" className={`${inter.variable} h-full antialiased`}>
+    <html lang="pt-BR" className="h-full antialiased">
       <body className="min-h-full flex flex-col bg-bg text-ink">
         <Providers>
           <div className="mx-auto w-full max-w-md flex-1 flex flex-col">

@@ -7,6 +7,7 @@ import {
 import { createClient } from "@/lib/supabase/server";
 import type { Address, Profile } from "@/lib/types";
 import { LogoutButton, NotificationToggle } from "./profile-actions";
+import { BottomNavbar } from "@/components/bottom-navbar";
 
 function initials(name: string) {
   return name.trim().split(/\s+/).slice(0, 2).map((part) => part[0]?.toUpperCase()).join("") || "MJ";
@@ -110,6 +111,7 @@ export default async function PerfilPage() {
       </div>
 
       <footer className="shrink-0 px-5 pb-5 pt-3.5"><LogoutButton /></footer>
+      <BottomNavbar />
     </main>
   );
 }

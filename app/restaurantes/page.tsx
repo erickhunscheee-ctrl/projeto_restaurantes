@@ -2,6 +2,7 @@ import { ArrowLeft, Search, Star, User, UtensilsCrossed } from "lucide-react";
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
 import type { Establishment } from "@/lib/types";
+import { BottomNavbar } from "@/components/bottom-navbar";
 
 export default async function RestaurantesPage() {
   const supabase = await createClient();
@@ -21,7 +22,12 @@ export default async function RestaurantesPage() {
           <User size={17} />
         </Link>
       </div>
-
+      <div className="flex gap-1 px-5 pt-3.5">
+        <p className="opacity-50">Qual</p>
+        <p className="font-bold">Rango</p>
+        <p className="opacity-50">você vai</p>
+        <p className="font-bold">Hoje?</p>
+      </div>
       <div className="px-5 pt-3.5">
         <div className="flex items-center gap-2 rounded-xl border border-border bg-[#FBF8F1] px-3.5 py-2.5">
           <Search size={18} className="text-ink-soft" />
@@ -48,9 +54,8 @@ export default async function RestaurantesPage() {
             <Link
               key={r.id}
               href={fechado ? "#" : `/restaurantes/${r.id}`}
-              className={`flex items-center gap-3 rounded-2xl border border-border p-2.5 ${
-                fechado ? "pointer-events-none opacity-55" : ""
-              }`}
+              className={`flex items-center gap-3 rounded-2xl border border-border p-2.5 ${fechado ? "pointer-events-none opacity-55" : ""
+                }`}
             >
               <div
                 className="flex h-14 w-14 shrink-0 items-center justify-center overflow-hidden rounded-xl"
@@ -81,6 +86,8 @@ export default async function RestaurantesPage() {
           );
         })}
       </div>
+
+      <BottomNavbar />
     </main>
   );
 }

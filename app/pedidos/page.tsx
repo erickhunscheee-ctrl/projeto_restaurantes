@@ -4,6 +4,7 @@ import { ArrowLeft, ChevronRight, Receipt } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
 import { formatBRL } from "@/lib/utils";
 import type { Order } from "@/lib/types";
+import { BottomNavbar } from "@/components/bottom-navbar";
 
 export default async function PedidosPage() {
   const supabase = await createClient();
@@ -24,5 +25,6 @@ export default async function PedidosPage() {
         <span className="flex items-center gap-2 text-[13px] font-medium text-red-dark">{formatBRL(order.total)}<ChevronRight size={16} className="text-ink-faint" /></span>
       </Link>)}
     </div>
+    <BottomNavbar />
   </main>;
 }

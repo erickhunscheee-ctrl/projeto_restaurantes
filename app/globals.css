@@ -1,8 +1,31 @@
 @import "tailwindcss";
 
+@font-face {
+  font-family: "PolySans";
+  src:
+    local("PolySans Regular"),
+    local("PolySans-Regular"),
+    url("/fonts/PolySans-Regular.woff2") format("woff2");
+  font-display: swap;
+  font-style: normal;
+  font-weight: 400;
+}
+
+@font-face {
+  font-family: "PolySans";
+  src:
+    local("PolySans SemiBold"),
+    local("PolySans-SemiBold"),
+    url("/fonts/PolySans-SemiBold.woff2") format("woff2");
+  font-display: swap;
+  font-style: normal;
+  font-weight: 600;
+}
+
 :root {
   --background: #FFFCF7;
   --foreground: #231F1B;
+  --font-polysans: "PolySans", Arial, Helvetica, sans-serif;
 
   --color-red: #C0392B;
   --color-red-dark: #791F1F;
@@ -20,7 +43,7 @@
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-inter);
+  --font-sans: var(--font-polysans);
 
   --color-red: var(--color-red);
   --color-red-dark: var(--color-red-dark);
@@ -38,5 +61,68 @@
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: var(--font-inter), sans-serif;
+  font-family: var(--font-polysans);
+  font-weight: 400;
+}
+
+/* Escala tipográfica PolySans Regular */
+.type-normal-28 {
+  font-size: 28px;
+  line-height: 34px;
+  font-weight: 400;
+}
+
+.type-normal-24 {
+  font-size: 24px;
+  line-height: 30px;
+  font-weight: 400;
+}
+
+.type-normal-16 {
+  font-size: 16px;
+  line-height: 22px;
+  font-weight: 400;
+}
+
+.type-normal-14 {
+  font-size: 14px;
+  line-height: 20px;
+  font-weight: 400;
+}
+
+.type-normal-12 {
+  font-size: 12px;
+  line-height: 16px;
+  font-weight: 400;
+}
+
+/* Escala tipográfica PolySans SemiBold */
+.type-semibold-28 {
+  font-size: 28px;
+  line-height: 34px;
+  font-weight: 600;
+}
+
+.type-semibold-24 {
+  font-size: 24px;
+  line-height: 30px;
+  font-weight: 600;
+}
+
+.type-semibold-16 {
+  font-size: 16px;
+  line-height: 22px;
+  font-weight: 600;
+}
+
+.type-semibold-14 {
+  font-size: 14px;
+  line-height: 20px;
+  font-weight: 600;
+}
+
+.type-semibold-12 {
+  font-size: 12px;
+  line-height: 16px;
+  font-weight: 600;
 }
