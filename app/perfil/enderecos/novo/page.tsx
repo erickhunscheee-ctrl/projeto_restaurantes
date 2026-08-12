@@ -289,9 +289,8 @@ export default function NovoEnderecoPage() {
           className="mt-4 flex items-center gap-2.5 text-[13px]"
         >
           <span
-            className={`flex h-5 w-5 items-center justify-center rounded-md border ${
-              isDefault ? "border-green bg-green text-bg" : "border-border-strong"
-            }`}
+            className={`flex h-5 w-5 items-center justify-center rounded-md border ${isDefault ? "border-green bg-green text-bg" : "border-border-strong"
+              }`}
           >
             {isDefault && <Check size={14} />}
           </span>

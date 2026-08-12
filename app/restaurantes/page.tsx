@@ -62,16 +62,10 @@ export default async function RestaurantesPage() {
         {lista.map((r) => {
           const fechado = r.status === "fechado";
           return (
-            <Link
-              key={r.id}
-              href={fechado ? "#" : `/restaurantes/${r.id}`}
-              className={`flex items-center gap-3 rounded-2xl border border-border p-2.5 ${fechado ? "pointer-events-none opacity-55" : "" }`}>
+            <Link key={r.id} href={fechado ? "#" : `/restaurantes/${r.id}`}
+              className={`flex items-center gap-3 rounded-2xl border border-border p-2.5 ${fechado ? "pointer-events-none opacity-55" : ""}`}>
               <div className="flex h-14 w-14 shrink-0 items-center justify-center overflow-hidden rounded-xl"
-                style={{
-                  background: r.foto_url
-                    ? `url(${r.foto_url}) center/cover`
-                    : `linear-gradient(135deg, ${r.avatar_cor ?? "var(--color-primary-500)"}, var(--color-primary-800))`,
-                }}
+                style={{ background: r.foto_url ? `url(${r.foto_url}) center/cover` : `linear-gradient(135deg, ${r.avatar_cor ?? "var(--color-primary-500)"}, var(--color-primary-800))`, }}
               >
                 {!r.foto_url && <UtensilsCrossed size={20} className="text-bg opacity-85" />}
               </div>
