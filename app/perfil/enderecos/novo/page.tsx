@@ -7,9 +7,11 @@ import { ArrowLeft, Check, LoaderCircle, LocateFixed } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { createClient } from "@/lib/supabase/client";
 
-const emptyLocation = {
+const emptyAddress = {
   cep: "",
+  rua: "",
   numero: "",
+  complemento: "",
   bairro: "",
   cidade: "",
   estado: "",
@@ -17,15 +19,36 @@ const emptyLocation = {
   longitude: "",
 };
 
+type AddressForm = typeof emptyAddress;
+
+const inputClass =
+  "mt-2 w-full rounded-xl border border-border-strong bg-neutral-000 px-3.5 py-3.5 text-sm text-neutral-900 outline-none";
+const labelClass = "text-xs font-medium uppercase tracking-wide text-red-dark";
+
+function formatAddress(address: AddressForm) {
+  const street = [address.rua.trim(), address.numero.trim()].filter(Boolean).join(", ");
+  const locality = [address.bairro.trim(), address.cidade.trim()].filter(Boolean).join(", ");
+  const stateAndCep = [address.estado.trim().toUpperCase(), address.cep.trim()]
+    .filter(Boolean)
+    .join(" · ");
+
+  return [street, address.complemento.trim(), locality, stateAndCep]
+    .filter(Boolean)
+    .join(" - ");
+}
+
 export default function NovoEnderecoPage() {
   const router = useRouter();
   const [label, setLabel] = useState("");
-  const [address, setAddress] = useState("");
+  const [address, setAddress] = useState<AddressForm>(emptyAddress);
   const [isDefault, setIsDefault] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
   const [locating, setLocating] = useState(false);
-  const [location, setLocation] = useState(emptyLocation);
+
+  function setField(field: keyof AddressForm, value: string) {
+    setAddress((current) => ({ ...current, [field]: value }));
+  }
 
   function useCurrentLocation() {
     setError(null);
@@ -54,21 +77,17 @@ export default function NovoEnderecoPage() {
           }
 
           const found = result.location;
-          setAddress(
-            found.endereco_completo ||
-              [found.endereco, found.numero, found.bairro, found.cidade, found.estado]
-                .filter(Boolean)
-                .join(", "),
-          );
-          setLocation({
+          setAddress((current) => ({
+            ...current,
             cep: found.cep ?? "",
+            rua: found.endereco ?? "",
             numero: found.numero ?? "",
             bairro: found.bairro ?? "",
             cidade: found.cidade ?? "",
             estado: found.estado ?? "",
             latitude: found.latitude ?? String(coords.latitude),
             longitude: found.longitude ?? String(coords.longitude),
-          });
+          }));
         } catch {
           setError("Não foi possível consultar o endereço.");
         } finally {
@@ -88,11 +107,19 @@ export default function NovoEnderecoPage() {
   }
 
   async function save() {
-    if (!label.trim() || address.trim().length < 3) {
-      setError("Preencha o rótulo e o endereço.");
+    if (
+      !label.trim() ||
+      !address.rua.trim() ||
+      !address.numero.trim() ||
+      !address.bairro.trim() ||
+      !address.cidade.trim() ||
+      !address.estado.trim()
+    ) {
+      setError("Preencha rótulo, rua, número, bairro, cidade e estado.");
       return;
     }
 
+    const formattedAddress = formatAddress(address);
     setSaving(true);
     setError(null);
     const supabase = createClient();
@@ -109,15 +136,17 @@ export default function NovoEnderecoPage() {
     const { error: insertError } = await supabase.from("addresses").insert({
       user_id: user.id,
       rotulo: label.trim(),
-      endereco: address.trim(),
+      endereco: formattedAddress,
       padrao: isDefault,
-      cep: location.cep || null,
-      numero: location.numero || null,
-      bairro: location.bairro || null,
-      cidade: location.cidade || null,
-      estado: location.estado || null,
-      latitude: location.latitude ? Number(location.latitude) : null,
-      longitude: location.longitude ? Number(location.longitude) : null,
+      cep: address.cep.trim() || null,
+      rua: address.rua.trim(),
+      numero: address.numero.trim(),
+      complemento: address.complemento.trim() || null,
+      bairro: address.bairro.trim(),
+      cidade: address.cidade.trim(),
+      estado: address.estado.trim().toUpperCase(),
+      latitude: address.latitude ? Number(address.latitude) : null,
+      longitude: address.longitude ? Number(address.longitude) : null,
     });
 
     setSaving(false);
@@ -139,49 +168,119 @@ export default function NovoEnderecoPage() {
         <h1 className="text-base font-medium">Novo endereço</h1>
       </header>
 
-      <div className="px-5 pt-6">
-        <label className="text-xs font-medium uppercase tracking-wide text-red-dark">
-          Rótulo
-        </label>
+      <div className="px-5 pb-7 pt-6">
+        <label className={labelClass}>Rótulo</label>
         <input
           value={label}
           onChange={(event) => setLabel(event.target.value)}
           placeholder="Casa, Trabalho..."
           maxLength={40}
-          className="mb-4 mt-2 w-full rounded-xl border border-border-strong bg-neutral-000 px-3.5 py-3.5 text-sm text-neutral-900 outline-none"
+          className={`${inputClass} mb-4`}
         />
 
-        <label className="text-xs font-medium uppercase tracking-wide text-red-dark">
-          Endereço completo
-        </label>
         <button
           type="button"
           onClick={useCurrentLocation}
           disabled={locating}
-          className="mt-2 flex w-full items-center justify-center gap-2 rounded-xl border border-primary-500 px-3.5 py-3 text-sm font-semibold text-primary-700 disabled:opacity-50"
+          className="mb-5 flex w-full items-center justify-center gap-2 rounded-xl border border-primary-500 px-3.5 py-3 text-sm font-semibold text-primary-700 disabled:opacity-50"
         >
           {locating ? (
             <LoaderCircle size={17} className="animate-spin" />
           ) : (
             <LocateFixed size={17} />
           )}
-          {locating ? "Localizando..." : "Usar minha localização atual"}
+          {locating ? "Localizando..." : "Preencher com minha localização"}
         </button>
-        <textarea
-          value={address}
-          onChange={(event) => {
-            setAddress(event.target.value);
-            setLocation(emptyLocation);
-          }}
-          placeholder="Rua, número, complemento e bairro"
-          rows={4}
-          maxLength={300}
-          className="mt-2 w-full resize-none rounded-xl border border-border-strong bg-neutral-000 px-3.5 py-3.5 text-sm text-neutral-900 outline-none"
-        />
-        {location.latitude && (
-          <p className="mt-1.5 text-[10px] text-ink-soft">
-            Endereço obtido com dados de © OpenStreetMap contributors.
-          </p>
+
+        <div className="grid grid-cols-[1fr_110px] gap-3">
+          <div>
+            <label className={labelClass}>CEP</label>
+            <input
+              value={address.cep}
+              onChange={(event) => setField("cep", event.target.value)}
+              placeholder="00000-000"
+              inputMode="numeric"
+              maxLength={9}
+              className={inputClass}
+            />
+          </div>
+          <div>
+            <label className={labelClass}>Número</label>
+            <input
+              value={address.numero}
+              onChange={(event) => setField("numero", event.target.value)}
+              placeholder="123"
+              maxLength={20}
+              className={inputClass}
+            />
+          </div>
+        </div>
+
+        <div className="mt-4">
+          <label className={labelClass}>Rua</label>
+          <input
+            value={address.rua}
+            onChange={(event) => setField("rua", event.target.value)}
+            placeholder="Rua ou avenida"
+            maxLength={150}
+            className={inputClass}
+          />
+        </div>
+
+        <div className="mt-4">
+          <label className={labelClass}>Complemento</label>
+          <input
+            value={address.complemento}
+            onChange={(event) => setField("complemento", event.target.value)}
+            placeholder="Apartamento, bloco, referência..."
+            maxLength={100}
+            className={inputClass}
+          />
+        </div>
+
+        <div className="mt-4">
+          <label className={labelClass}>Bairro</label>
+          <input
+            value={address.bairro}
+            onChange={(event) => setField("bairro", event.target.value)}
+            placeholder="Bairro"
+            maxLength={100}
+            className={inputClass}
+          />
+        </div>
+
+        <div className="mt-4 grid grid-cols-[1fr_90px] gap-3">
+          <div>
+            <label className={labelClass}>Cidade</label>
+            <input
+              value={address.cidade}
+              onChange={(event) => setField("cidade", event.target.value)}
+              placeholder="Cidade"
+              maxLength={100}
+              className={inputClass}
+            />
+          </div>
+          <div>
+            <label className={labelClass}>Estado</label>
+            <input
+              value={address.estado}
+              onChange={(event) => setField("estado", event.target.value.toUpperCase())}
+              placeholder="UF"
+              maxLength={2}
+              className={inputClass}
+            />
+          </div>
+        </div>
+
+        {address.latitude && address.longitude && (
+          <div className="mt-4 rounded-xl bg-green-tint px-3.5 py-3">
+            <p className="flex items-center gap-1.5 text-xs font-medium text-green">
+              <LocateFixed size={14} /> Localização salva neste endereço
+            </p>
+            <p className="mt-1 text-[10px] text-ink-soft">
+              {address.latitude}, {address.longitude} · © OpenStreetMap contributors
+            </p>
+          </div>
         )}
 
         <button

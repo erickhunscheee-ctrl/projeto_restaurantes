@@ -13,7 +13,7 @@ export async function GET() {
 
   const { data, error } = await supabase
     .from("addresses")
-    .select("id, rotulo, endereco, padrao")
+    .select("id, rotulo, endereco, padrao, cep, rua, numero, complemento, bairro, cidade, estado, latitude, longitude")
     .eq("user_id", user.id)
     .eq("padrao", true)
     .maybeSingle();
