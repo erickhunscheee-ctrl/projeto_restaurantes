@@ -3,6 +3,17 @@
 @font-face {
   font-family: "PolySans";
   src:
+    local("PolySans Light"),
+    local("PolySans-Light"),
+    url("/fonts/PolySans-Light.woff2") format("woff2");
+  font-display: swap;
+  font-style: normal;
+  font-weight: 300;
+}
+
+@font-face {
+  font-family: "PolySans";
+  src:
     local("PolySans Regular"),
     local("PolySans-Regular"),
     url("/fonts/PolySans-Regular.woff2") format("woff2");
@@ -22,28 +33,67 @@
   font-weight: 600;
 }
 
-:root {
-  --background: #FFFCF7;
-  --foreground: #231F1B;
-  --font-polysans: "PolySans", Arial, Helvetica, sans-serif;
+@font-face {
+  font-family: "PolySans";
+  src:
+    local("PolySans Bold"),
+    local("PolySans-Bold"),
+    url("/fonts/PolySans-Bold.woff2") format("woff2");
+  font-display: swap;
+  font-style: normal;
+  font-weight: 700;
+}
 
-  --color-red: #C0392B;
-  --color-red-dark: #791F1F;
-  --color-red-tint: #FCEBEB;
-  --color-green: #27500A;
-  --color-green-tint: #EAF3DE;
-  --color-ink: #231F1B;
-  --color-ink-soft: #79776D;
-  --color-ink-faint: #A6A399;
-  --color-border: #E6E3D8;
-  --color-border-strong: #D3D1C7;
-  --color-bg: #FFFCF7;
+:root {
+  --color-primary-500: #F55905;
+  --color-primary-600: #CF4409;
+  --color-primary-700: #A23608;
+  --color-primary-800: #8A2F07;
+  --color-neutral-900: #1E1E1E;
+  --color-neutral-050: #F7F7F7;
+  --color-neutral-000: #FFFFFF;
+  --color-neutral-700: #505050;
+  --color-neutral-500: #737373;
+  --color-neutral-300: #BDBDBD;
+  --color-neutral-200: #E2E2E2;
+
+  --font-family-primary: "PolySans", Arial, Helvetica, sans-serif;
+  --font-size-heading-1: 28px;
+  --font-size-heading-2: 24px;
+  --font-size-body: 16px;
+  --font-size-body-small: 14px;
+  --font-size-caption: 12px;
+
+  --background: var(--color-neutral-050);
+  --foreground: var(--color-neutral-900);
+  --font-polysans: var(--font-family-primary);
+
+  /* Aliases semânticos usados pelos componentes existentes. */
+  --color-red: var(--color-primary-500);
+  --color-red-dark: var(--color-primary-700);
+  --color-red-tint: #FFF0E9;
+  --color-green: var(--color-primary-800);
+  --color-green-tint: #FFF4EF;
+  --color-ink: var(--color-neutral-900);
+  --color-ink-soft: var(--color-neutral-500);
+  --color-ink-faint: var(--color-neutral-300);
+  --color-border: var(--color-neutral-200);
+  --color-border-strong: #CFCFCF;
+  --color-bg: var(--color-neutral-050);
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --font-sans: var(--font-polysans);
+
+  --color-primary-500: var(--color-primary-500);
+  --color-primary-600: var(--color-primary-600);
+  --color-primary-700: var(--color-primary-700);
+  --color-primary-800: var(--color-primary-800);
+  --color-neutral-900: var(--color-neutral-900);
+  --color-neutral-050: var(--color-neutral-050);
+  --color-neutral-000: var(--color-neutral-000);
 
   --color-red: var(--color-red);
   --color-red-dark: var(--color-red-dark);
@@ -66,6 +116,84 @@ body {
 }
 
 /* Escala tipográfica PolySans Regular */
+.type-light-28 {
+  font-size: 28px;
+  line-height: 34px;
+  font-weight: 300;
+}
+
+.type-heading-1 {
+  font-size: var(--font-size-heading-1);
+  line-height: 34px;
+  font-weight: 700;
+}
+
+.type-heading-2 {
+  font-size: var(--font-size-heading-2);
+  line-height: 30px;
+  font-weight: 600;
+}
+
+.type-body-emphasis {
+  font-size: var(--font-size-body);
+  line-height: 22px;
+  font-weight: 600;
+}
+
+.type-body {
+  font-size: var(--font-size-body);
+  line-height: 22px;
+  font-weight: 400;
+}
+
+.type-body-small {
+  font-size: var(--font-size-body-small);
+  line-height: 20px;
+  font-weight: 400;
+}
+
+.type-label {
+  font-size: var(--font-size-body-small);
+  line-height: 20px;
+  font-weight: 600;
+}
+
+.type-caption {
+  font-size: var(--font-size-caption);
+  line-height: 16px;
+  font-weight: 400;
+}
+
+.type-caption-light {
+  font-size: var(--font-size-caption);
+  line-height: 16px;
+  font-weight: 300;
+}
+
+.type-light-24 {
+  font-size: 24px;
+  line-height: 30px;
+  font-weight: 300;
+}
+
+.type-light-16 {
+  font-size: 16px;
+  line-height: 22px;
+  font-weight: 300;
+}
+
+.type-light-14 {
+  font-size: 14px;
+  line-height: 20px;
+  font-weight: 300;
+}
+
+.type-light-12 {
+  font-size: 12px;
+  line-height: 16px;
+  font-weight: 300;
+}
+
 .type-normal-28 {
   font-size: 28px;
   line-height: 34px;

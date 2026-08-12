@@ -56,7 +56,7 @@ export default function PedidoPage({ params }: { params: Promise<{ orderId: stri
         </svg>
         <p className="text-[17px] font-medium text-bg">Pedido confirmado</p>
         {order.previsao_entrega && (
-          <p className="mt-1 text-[13px] text-[#C0DD97]">
+          <p className="mt-1 text-[13px] text-neutral-000/70">
             Chegará por volta das{" "}
             {new Date(order.previsao_entrega).toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" })}
           </p>
@@ -65,7 +65,7 @@ export default function PedidoPage({ params }: { params: Promise<{ orderId: stri
 
       <div className="flex items-baseline justify-between px-5 pt-4.5">
         <span className="text-xs font-medium uppercase tracking-wide text-red-dark">Status</span>
-        <span className="rounded-full border border-[#97C459] px-2.5 py-0.5 text-[11px] font-medium text-green">
+        <span className="rounded-full border border-primary-500 px-2.5 py-0.5 text-[11px] font-medium text-primary-700">
           pedido nº {order.id.slice(0, 8)}
         </span>
       </div>
@@ -79,13 +79,13 @@ export default function PedidoPage({ params }: { params: Promise<{ orderId: stri
                   className="h-3 w-3 rounded-full"
                   style={{
                     background: i <= etapaAtualIndex ? "var(--color-red)" : "var(--color-bg)",
-                    border: i <= etapaAtualIndex ? "none" : "1.5px solid #B4B2A9",
+                    border: i <= etapaAtualIndex ? "none" : "1.5px solid var(--color-border-strong)",
                   }}
                 />
                 {i < ETAPAS.length - 1 && (
                   <div
                     className="h-[34px] w-[1.5px]"
-                    style={{ background: i < etapaAtualIndex ? "#F0997B" : "var(--color-border-strong)" }}
+                    style={{ background: i < etapaAtualIndex ? "var(--color-primary-500)" : "var(--color-border-strong)" }}
                   />
                 )}
               </div>

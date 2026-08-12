@@ -66,7 +66,7 @@ export default function LoginPage() {
           className="w-full bg-transparent text-sm placeholder:text-ink-faint focus:outline-none"
         />
       </div>
-      <p className="mt-1.5 text-xs text-ink-soft">Enviaremos um código por SMS para confirmar.</p>
+      <p className="mt-1.5 text-xs text-ink-soft">Enviaremos um código pelo WhatsApp para confirmar.</p>
 
       {erro && <p className="mt-3 text-xs text-red-dark">{erro}</p>}
 

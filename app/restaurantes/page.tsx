@@ -29,7 +29,7 @@ export default async function RestaurantesPage() {
         <p className="font-bold">Hoje?</p>
       </div>
       <div className="px-5 pt-3.5">
-        <div className="flex items-center gap-2 rounded-xl border border-border bg-[#FBF8F1] px-3.5 py-2.5">
+        <div className="flex items-center gap-2 rounded-xl border border-border bg-neutral-000 px-3.5 py-2.5">
           <Search size={18} className="text-ink-soft" />
           <span className="text-sm text-ink-faint">Buscar por nome ou tipo de comida</span>
         </div>
@@ -62,7 +62,7 @@ export default async function RestaurantesPage() {
                 style={{
                   background: r.foto_url
                     ? `url(${r.foto_url}) center/cover`
-                    : `linear-gradient(135deg, ${r.avatar_cor ?? "#C0392B"}, #7A2318)`,
+                    : `linear-gradient(135deg, ${r.avatar_cor ?? "var(--color-primary-500)"}, var(--color-primary-800))`,
                 }}
               >
                 {!r.foto_url && <UtensilsCrossed size={20} className="text-bg opacity-85" />}

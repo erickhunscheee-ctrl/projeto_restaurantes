@@ -17,7 +17,7 @@ export function AddDishButton({
   return (
     <button
       onClick={() => router.push(`/restaurantes/${establishmentId}/prato/${dish.id}`)}
-      className="mt-1 inline-flex items-center justify-center rounded-full bg-[#3B6D11] p-1 text-bg"
+      className="mt-1 inline-flex items-center justify-center rounded-full bg-primary-700 p-1 text-bg"
       aria-label={`Adicionar ${dish.nome}`}
     >
       <Plus size={16} />

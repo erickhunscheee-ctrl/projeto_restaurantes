@@ -169,7 +169,7 @@ export function DishCustomizer({
       </div>
 
       {conflito && (
-        <div className="mx-5 mb-2 rounded-xl border border-[#E24B4A] bg-red-tint px-3.5 py-2.5 text-xs text-red-dark">
+        <div className="mx-5 mb-2 rounded-xl border border-primary-500 bg-red-tint px-3.5 py-2.5 text-xs text-red-dark">
           Sua sacola já tem itens de outro restaurante. Esvazie a sacola atual antes de adicionar este prato.
         </div>
       )}

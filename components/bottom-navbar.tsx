@@ -45,7 +45,7 @@ export function BottomNavbar() {
                   className={`flex min-h-14 flex-col items-center justify-center gap-1 rounded-xl text-[11px] font-medium transition-colors ${
                     isActive
                       ? "bg-red-tint text-red-dark"
-                      : "text-ink-soft hover:bg-[#F7F3EB] hover:text-ink"
+                      : "text-ink-soft hover:bg-neutral-000 hover:text-ink"
                   }`}
                 >
                   <Icon size={20} strokeWidth={isActive ? 2.4 : 2} />

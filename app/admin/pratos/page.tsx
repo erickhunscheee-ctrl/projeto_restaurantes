@@ -8,7 +8,7 @@ import type { Dish, DishOption } from "@/lib/types";
 const CHIP_STYLE: Record<DishOption["grupo"], string> = {
   proteina: "bg-red-tint text-red-dark",
   acompanhamento: "bg-green-tint text-green",
-  extra: "bg-[#F0EEE6] text-ink-soft",
+  extra: "bg-neutral-000 text-ink-soft",
 };
 
 export default async function PratosPage() {

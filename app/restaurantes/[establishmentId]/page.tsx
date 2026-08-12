@@ -38,7 +38,7 @@ export default async function CardapioPage({
         style={{
           background: r.foto_url
             ? `url(${r.foto_url}) center/cover`
-            : "linear-gradient(135deg, #C0392B, #7A2318)",
+            : "linear-gradient(135deg, var(--color-primary-500), var(--color-primary-800))",
         }}
       >
         {!r.foto_url && (
@@ -57,7 +57,7 @@ export default async function CardapioPage({
         </div>
         <div className="absolute inset-x-5 bottom-3.5">
           <p className="text-lg font-medium text-bg">{r.nome}</p>
-          <div className="mt-1 flex items-center gap-2.5 text-xs text-[#F0DED9]">
+          <div className="mt-1 flex items-center gap-2.5 text-xs text-neutral-000/80">
             <span>{r.tipo_cozinha} · {r.distancia_km ?? "—"} km</span>
           </div>
         </div>
@@ -68,7 +68,7 @@ export default async function CardapioPage({
           <Clock size={12} /> {r.status === "aberto" ? "Aberto agora" : "Fechado"}
         </span>
         {r.horario_fechamento && (
-          <span className="rounded-full border border-border bg-[#FBF8F1] px-3 py-1 text-[11px] font-medium text-ink-soft">
+          <span className="rounded-full border border-border bg-neutral-000 px-3 py-1 text-[11px] font-medium text-ink-soft">
             Fecha às {r.horario_fechamento}
           </span>
         )}
@@ -76,7 +76,7 @@ export default async function CardapioPage({
 
       <div className="flex items-baseline justify-between px-5 pt-4.5">
         <span className="text-sm font-medium">Cardápio de hoje</span>
-        <span className="rounded-full border border-[#E24B4A] px-2.5 py-0.5 text-[11px] font-medium text-red-dark">
+        <span className="rounded-full border border-primary-500 px-2.5 py-0.5 text-[11px] font-medium text-red-dark">
           {new Date().toLocaleDateString("pt-BR", { weekday: "short", day: "2-digit", month: "short" })}
         </span>
       </div>
