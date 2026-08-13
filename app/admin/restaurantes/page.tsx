@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { LoaderCircle, LocateFixed } from "lucide-react";
+import { ImagePlus, LoaderCircle, LocateFixed } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 type Restaurant = {
@@ -19,6 +19,16 @@ type Restaurant = {
   estado?: string | null;
   latitude?: number | null;
   longitude?: number | null;
+  establishment_categories?: { category_id: string }[];
+};
+
+type Category = {
+  id: string;
+  nome: string;
+  slug: string;
+  image_url: string | null;
+  ordem: number;
+  ativo: boolean;
 };
 
 type Dish = {
@@ -58,6 +68,17 @@ const inputClass = "w-full rounded-xl border border-border-strong bg-neutral-000
 
 export default function PlatformRestaurantsPage() {
   const [restaurants, setRestaurants] = useState<Restaurant[]>([]);
+  const [categories, setCategories] = useState<Category[]>([]);
+  const [selectedCategoryIds, setSelectedCategoryIds] = useState<string[]>([]);
+  const [categoryName, setCategoryName] = useState("");
+  const [categoryOrder, setCategoryOrder] = useState("");
+  const [categoryImage, setCategoryImage] = useState<File | null>(null);
+  const [savingCategory, setSavingCategory] = useState(false);
+  const [editingCategory, setEditingCategory] = useState<string | null>(null);
+  const [categoryEditName, setCategoryEditName] = useState("");
+  const [categoryEditOrder, setCategoryEditOrder] = useState("");
+  const [categoryEditActive, setCategoryEditActive] = useState(true);
+  const [categoryEditImage, setCategoryEditImage] = useState<File | null>(null);
   const [selected, setSelected] = useState("");
   const [dishes, setDishes] = useState<Dish[]>([]);
   const [name, setName] = useState("");
@@ -89,7 +110,63 @@ export default function PlatformRestaurantsPage() {
     if (response.ok) setDishes(result.dishes);
   }
 
-  useEffect(() => { loadRestaurants(); }, []);
+  async function loadCategories() {
+    const response = await fetch("/api/admin/categories", { cache: "no-store" });
+    const result = await response.json();
+    if (!response.ok) return setError(result.error);
+    setCategories(result.categories);
+  }
+
+  async function createCategory() {
+    if (!categoryName.trim() || !categoryImage) return;
+    setSavingCategory(true);
+    setError(null);
+    const form = new FormData();
+    form.set("nome", categoryName.trim());
+    form.set("ordem", categoryOrder || "0");
+    form.set("image", categoryImage);
+    const response = await fetch("/api/admin/categories", { method: "POST", body: form });
+    const result = await response.json();
+    setSavingCategory(false);
+    if (!response.ok) return setError(result.error);
+    setCategoryName("");
+    setCategoryOrder("");
+    setCategoryImage(null);
+    await loadCategories();
+  }
+
+  async function saveCategory(id: string) {
+    if (!categoryEditName.trim()) return;
+    setSavingCategory(true);
+    setError(null);
+    const form = new FormData();
+    form.set("id", id);
+    form.set("nome", categoryEditName.trim());
+    form.set("ordem", categoryEditOrder || "0");
+    form.set("ativo", String(categoryEditActive));
+    if (categoryEditImage) form.set("image", categoryEditImage);
+    const response = await fetch("/api/admin/categories", { method: "PATCH", body: form });
+    const result = await response.json();
+    setSavingCategory(false);
+    if (!response.ok) return setError(result.error);
+    setEditingCategory(null);
+    setCategoryEditImage(null);
+    await loadCategories();
+  }
+
+  async function deleteCategory(id: string) {
+    const response = await fetch("/api/admin/categories", {
+      method: "DELETE",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ id }),
+    });
+    const result = await response.json();
+    if (!response.ok) return setError(result.error);
+    setSelectedCategoryIds((current) => current.filter((categoryId) => categoryId !== id));
+    await loadCategories();
+  }
+
+  useEffect(() => { loadRestaurants(); loadCategories(); }, []);
   useEffect(() => { loadDishes(selected); }, [selected]);
   useEffect(() => {
     if (!selectedRestaurant) return;
@@ -105,6 +182,9 @@ export default function PlatformRestaurantsPage() {
       latitude: selectedRestaurant.latitude?.toString() ?? "",
       longitude: selectedRestaurant.longitude?.toString() ?? "",
     });
+    setSelectedCategoryIds(
+      selectedRestaurant.establishment_categories?.map((item) => item.category_id) ?? [],
+    );
   }, [selectedRestaurant]);
 
   async function createRestaurant() {
@@ -152,6 +232,7 @@ export default function PlatformRestaurantsPage() {
         ...details,
         latitude: details.latitude ? Number(details.latitude) : null,
         longitude: details.longitude ? Number(details.longitude) : null,
+        category_ids: selectedCategoryIds,
       }),
     });
     const result = await response.json();
@@ -254,6 +335,72 @@ export default function PlatformRestaurantsPage() {
     </section>
 
     <section className="rounded-2xl border border-border bg-neutral-000 p-4">
+      <h2 className="text-lg font-semibold text-neutral-900">Categorias</h2>
+      <p className="mt-1 text-xs text-neutral-500">Cadastre a imagem que aparecerá na página de restaurantes.</p>
+      <div className="mt-4 grid gap-2 sm:grid-cols-[1fr_100px_1fr_auto]">
+        <input value={categoryName} onChange={(event) => setCategoryName(event.target.value)} placeholder="Nome da categoria" className={inputClass} />
+        <input value={categoryOrder} onChange={(event) => setCategoryOrder(event.target.value)} placeholder="Ordem" type="number" className={inputClass} />
+        <label className={`${inputClass} flex cursor-pointer items-center gap-2 text-neutral-600`}>
+          <ImagePlus size={17} />
+          <span className="min-w-0 truncate">{categoryImage?.name ?? "Selecionar imagem"}</span>
+          <input type="file" accept="image/jpeg,image/png,image/webp,image/avif" className="hidden" onChange={(event) => setCategoryImage(event.target.files?.[0] ?? null)} />
+        </label>
+        <Button className="w-full sm:w-auto" onClick={createCategory} disabled={savingCategory || !categoryName.trim() || !categoryImage}>
+          {savingCategory ? "Salvando..." : "Adicionar"}
+        </Button>
+      </div>
+      <p className="mt-2 text-[10px] text-neutral-500">JPEG, PNG, WebP ou AVIF, com no máximo 3 MB.</p>
+
+      <div className="mt-4 grid gap-2 sm:grid-cols-2">
+        {categories.map((category) => (
+          <div key={category.id} className="rounded-xl border border-border p-3">
+            {editingCategory === category.id ? (
+              <div className="space-y-2">
+                <div className="grid grid-cols-[1fr_90px] gap-2">
+                  <input autoFocus value={categoryEditName} onChange={(event) => setCategoryEditName(event.target.value)} className={inputClass} />
+                  <input value={categoryEditOrder} onChange={(event) => setCategoryEditOrder(event.target.value)} type="number" placeholder="Ordem" className={inputClass} />
+                </div>
+                <label className={`${inputClass} flex cursor-pointer items-center gap-2 text-neutral-600`}>
+                  <ImagePlus size={17} />
+                  <span className="min-w-0 truncate">{categoryEditImage?.name ?? "Trocar imagem"}</span>
+                  <input type="file" accept="image/jpeg,image/png,image/webp,image/avif" className="hidden" onChange={(event) => setCategoryEditImage(event.target.files?.[0] ?? null)} />
+                </label>
+                <label className="flex items-center gap-2 text-xs text-neutral-700">
+                  <input type="checkbox" checked={categoryEditActive} onChange={(event) => setCategoryEditActive(event.target.checked)} />
+                  Categoria ativa
+                </label>
+                <div className="flex gap-3">
+                  <button onClick={() => saveCategory(category.id)} disabled={savingCategory} className="text-xs font-semibold text-primary-700">Salvar</button>
+                  <button onClick={() => { setEditingCategory(null); setCategoryEditImage(null); }} className="text-xs text-neutral-500">Cancelar</button>
+                </div>
+              </div>
+            ) : (
+              <div className="flex items-center gap-3">
+                <div className="flex h-14 w-14 shrink-0 items-center justify-center overflow-hidden rounded-xl bg-neutral-050 text-neutral-400">
+                  {category.image_url ? <img src={category.image_url} alt="" className="h-full w-full object-cover" /> : <ImagePlus size={20} />}
+                </div>
+                <div className="min-w-0 flex-1">
+                  <p className="truncate text-sm font-semibold text-neutral-900">{category.nome}</p>
+                  <p className="mt-0.5 text-[11px] text-neutral-500">Ordem {category.ordem} · {category.ativo ? "ativa" : "inativa"}</p>
+                </div>
+                <div className="flex flex-col items-end gap-1.5">
+                  <button onClick={() => {
+                    setEditingCategory(category.id);
+                    setCategoryEditName(category.nome);
+                    setCategoryEditOrder(String(category.ordem));
+                    setCategoryEditActive(category.ativo);
+                    setCategoryEditImage(null);
+                  }} className="text-xs text-primary-700">Editar</button>
+                  <button onClick={() => deleteCategory(category.id)} className="text-xs text-red-dark">Excluir</button>
+                </div>
+              </div>
+            )}
+          </div>
+        ))}
+      </div>
+    </section>
+
+    <section className="rounded-2xl border border-border bg-neutral-000 p-4">
       <h2 className="text-lg font-semibold text-neutral-900">Dados do restaurante</h2>
       {!selected ? <p className="mt-3 text-sm text-neutral-500">Selecione um restaurante.</p> : <>
         <div className="mt-4 flex items-center justify-between gap-3">
@@ -262,6 +409,26 @@ export default function PlatformRestaurantsPage() {
             {locating ? <LoaderCircle size={14} className="animate-spin" /> : <LocateFixed size={14} />}
             {locating ? "Localizando..." : "Usar localização atual"}
           </button>
+        </div>
+        <div className="mt-4">
+          <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-neutral-600">Categorias</p>
+          <div className="flex flex-wrap gap-2">
+            {categories.map((category) => {
+              const checked = selectedCategoryIds.includes(category.id);
+              return <button
+                key={category.id}
+                type="button"
+                onClick={() => setSelectedCategoryIds((current) =>
+                  checked
+                    ? current.filter((id) => id !== category.id)
+                    : [...current, category.id]
+                )}
+                className={`rounded-xl border px-3 py-2 text-xs font-semibold ${checked ? "border-primary-500 bg-primary-500 text-white" : "border-border bg-neutral-000 text-neutral-700"}`}
+              >
+                {category.image_url && <img src={category.image_url} alt="" className="mr-1.5 inline-block h-5 w-5 rounded-md object-cover" />}{category.nome}
+              </button>;
+            })}
+          </div>
         </div>
         <div className="mt-2 grid gap-2 sm:grid-cols-2">
           {detailInput("telefone", "Telefone / WhatsApp")}

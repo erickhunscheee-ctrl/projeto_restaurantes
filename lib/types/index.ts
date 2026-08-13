@@ -12,6 +12,15 @@ export type Establishment = {
   avatar_cor: string | null;
 };
 
+export type Category = {
+  id: string;
+  nome: string;
+  slug: string;
+  image_url: string | null;
+  ordem: number;
+  ativo: boolean;
+};
+
 export type Dish = {
   id: string;
   establishment_id: string;
