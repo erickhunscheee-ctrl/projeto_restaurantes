@@ -1,9 +1,10 @@
-import { Grid2X2, Search, Star, UtensilsCrossed } from "lucide-react";
+import { Search, Star, UtensilsCrossed } from "lucide-react";
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
-import type { Category, Establishment } from "@/lib/types";
+import type { Establishment } from "@/lib/types";
 import { BottomNavbar } from "@/components/bottom-navbar";
 import { DeliveryAddress } from "@/components/delivery-address";
+import { RestaurantCategories } from "@/components/restaurant-categories";
 
 type PageProps = {
   searchParams: Promise<{ categoria?: string }>;
@@ -12,12 +13,6 @@ type PageProps = {
 export default async function RestaurantesPage({ searchParams }: PageProps) {
   const { categoria } = await searchParams;
   const supabase = await createClient();
-
-  const categoriesQuery = supabase
-    .from("categories")
-    .select("id,nome,slug,image_url,ordem,ativo")
-    .eq("ativo", true)
-    .order("ordem");
 
   const establishmentsQuery = categoria ? supabase
     .from("establishments")
@@ -29,12 +24,7 @@ export default async function RestaurantesPage({ searchParams }: PageProps) {
       .select("*")
       .order("nota_media", { ascending: false });
 
-  const [{ data: categories }, { data: establishments }] = await Promise.all([
-    categoriesQuery,
-    establishmentsQuery,
-  ]);
-
-  const categoryList = (categories ?? []) as Category[];
+  const { data: establishments } = await establishmentsQuery;
   const lista = (establishments ?? []) as Establishment[];
 
   return (
@@ -68,53 +58,7 @@ export default async function RestaurantesPage({ searchParams }: PageProps) {
         </button>
       </div>
 
-      <section className="pt-5">
-        <div className="flex items-center justify-between px-5">
-          <h2 className="text-base font-semibold text-neutral-900">Categorias</h2>
-          {categoria && (
-            <Link href="/restaurantes" className="text-xs font-medium text-ink-soft">
-              Ver todas ›
-            </Link>
-          )}
-        </div>
-        <div className="mt-3 flex gap-2.5 overflow-x-auto px-5 pb-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
-          <Link
-            href="/restaurantes"
-            className={`flex shrink-0 items-center gap-2 rounded-2xl border px-2.5 py-2 pr-4 transition-colors ${!categoria
-                ? "border-primary-500 bg-primary-500 text-white"
-                : "border-border bg-neutral-000 text-neutral-900"
-              }`}
-          >
-            <span className={`flex h-10 w-10 items-center justify-center rounded-xl ${!categoria ? "bg-white/20" : "bg-neutral-050"}`}>
-              <Grid2X2 size={18} />
-            </span>
-            <span className="whitespace-nowrap text-sm font-medium">Todos</span>
-          </Link>
-
-          {categoryList.map((category) => {
-            const active = categoria === category.slug;
-            return (
-              <Link
-                key={category.id}
-                href={`/restaurantes?categoria=${category.slug}`}
-                className={`flex shrink-0 items-center gap-2 rounded-2xl border px-2.5 py-2 pr-4 transition-colors ${active
-                    ? "border-primary-500 bg-primary-500 text-white"
-                    : "border-border bg-neutral-000 text-neutral-900"
-                  }`}
-              >
-                <span className={`flex h-10 w-10 items-center justify-center overflow-hidden rounded-xl ${active ? "bg-white/20" : "bg-neutral-050"}`}>
-                  {category.image_url ? (
-                    <img src={category.image_url} alt="" className="h-full w-full object-cover" />
-                  ) : (
-                    <UtensilsCrossed size={17} />
-                  )}
-                </span>
-                <span className="whitespace-nowrap text-sm font-medium">{category.nome}</span>
-              </Link>
-            );
-          })}
-        </div>
-      </section>
+      <RestaurantCategories selectedSlug={categoria} />
 
       <div className="px-5 pt-4">
         <p className="text-xs font-medium uppercase tracking-wide text-red-dark">
