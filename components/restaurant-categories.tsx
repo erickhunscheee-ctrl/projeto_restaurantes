@@ -34,15 +34,16 @@ export function RestaurantCategories({ selectedSlug }: RestaurantCategoriesProps
     <section className="pt-5">
       <div className="flex items-center justify-between px-5">
         <h2 className="text-lg font-bold text-neutral-900">Categorias</h2>
-        <Link
-          href="/restaurantes"
-          className="flex items-center gap-0.5 text-xs font-medium text-neutral-400"
-        >
-          Ver todas
-          <span aria-hidden="true">›</span>
-        </Link>
+        {selectedSlug && (
+          <Link
+            href="/restaurantes"
+            className="flex items-center gap-0.5 text-xs font-medium text-neutral-400"
+          >
+            Ver todas
+            <span aria-hidden="true">›</span>
+          </Link>
+        )}
       </div>
-
       <div className="mt-3 flex gap-2.5 overflow-x-auto overflow-y-visible px-5 pt-2 pb-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
         <CategoryLink href="/restaurantes" label="Todos" active={!selectedSlug} />
 
@@ -111,10 +112,9 @@ function CategoryLink({
           -ml-6 flex h-11 items-center whitespace-nowrap
           rounded-2xl border pl-7 pr-4
           type-normal-16 transition-colors
-          ${
-            active
-              ? "border-primary-500 bg-primary-500 text-white"
-              : "border-neutral-200 bg-white text-neutral-900"
+          ${active
+            ? "border-primary-500 bg-primary-500 text-white"
+            : "border-neutral-200 bg-white text-neutral-900"
           }
         `}
       >
