@@ -33,7 +33,7 @@ export function RestaurantCategories({ selectedSlug }: RestaurantCategoriesProps
   return (
     <section className="pt-5">
       <div className="flex items-center justify-between px-5">
-        <h2 className="text-lg font-bold text-neutral-900">Categorias</h2>
+        <h2 className="text-lg type-normal-14 text-neutral-900">Categorias</h2>
         {selectedSlug && (
           <Link
             href="/restaurantes"
@@ -109,9 +109,9 @@ function CategoryLink({
       {/* PILL DE TEXTO */}
       <span
         className={`
-          -ml-6 flex h-11 items-center whitespace-nowrap
+          -ml-4 flex h-11 items-center whitespace-nowrap
           rounded-2xl border pl-7 pr-4
-          type-normal-16 transition-colors
+          type-normal-14 transition-colors
           ${active
             ? "border-primary-500 bg-primary-500 text-white"
             : "border-neutral-200 bg-white text-neutral-900"

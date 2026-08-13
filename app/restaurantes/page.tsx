@@ -43,9 +43,9 @@ export default async function RestaurantesPage({ searchParams }: PageProps) {
       </div>
 
       <div className="flex gap-1 px-5 pt-3.5">
-        <p className="opacity-50">Qual seu</p>
-        <p className="font-bold">Rango</p>
-        <p className="opacity-50">Hoje?</p>
+        <p className="type-normal-16 opacity-50">Qual seu</p>
+        <p className="type-semibold-16">Rango</p>
+        <p className="type-normal-16 opacity-50">Hoje?</p>
       </div>
 
       <div className="flex gap-3 px-5 pt-3.5">
