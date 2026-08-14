@@ -86,20 +86,20 @@ function CategoryLink({
       {/* IMAGEM */}
       <span
         className="
-          relative z-10 h-12 w-12 shrink-0
+          relative z-10 h-8 w-8 shrink-0
           flex items-center justify-center
-          overflow-hidden rounded-2xl
+          overflow-hidden rounded-md
           bg-neutral-000
           ring-4 ring-white
         "
       >
         {imageUrl ? (
-          <img src={imageUrl} alt="" className="h-6 w-6 object-cover" />
+          <img src={imageUrl} alt="" className="h-full w-full object-cover" />
         ) : label === "Todos" ? (
           <img
             src="/categorias/todos.png"
             alt=""
-            className="h-6 w-6 object-contain"
+            className="h-full w-full object-contain"
           />
         ) : (
           <UtensilsCrossed size={16} className="m-auto" />
@@ -109,12 +109,12 @@ function CategoryLink({
       {/* PILL DE TEXTO */}
       <span
         className={`
-          -ml-4 flex h-11 items-center whitespace-nowrap
-          rounded-2xl border pl-7 pr-4
+          -ml-4 flex h-10 items-center whitespace-nowrap
+          rounded-2xl pl-7 pr-4
           type-normal-14 transition-colors
           ${active
-            ? "border-primary-500 bg-primary-500 text-white"
-            : "border-neutral-200 bg-white text-neutral-900"
+            ? "bg-primary-500 text-white"
+            : "bg-white text-neutral-900"
           }
         `}
       >

@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import dynamic from "next/dynamic";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { ArrowLeft, Check, LoaderCircle, LocateFixed } from "lucide-react";
@@ -25,6 +26,11 @@ const inputClass =
   "mt-2 w-full rounded-xl border border-border-strong bg-neutral-000 px-3.5 py-3.5 text-sm text-neutral-900 outline-none";
 const labelClass = "text-xs font-medium uppercase tracking-wide text-red-dark";
 
+const AddressMapPicker = dynamic(
+  () => import("@/components/address-map-picker").then((module) => module.AddressMapPicker),
+  { ssr: false },
+);
+
 function formatAddress(address: AddressForm) {
   const street = [address.rua.trim(), address.numero.trim()].filter(Boolean).join(", ");
   const locality = [address.bairro.trim(), address.cidade.trim()].filter(Boolean).join(", ");
@@ -45,6 +51,8 @@ export default function NovoEnderecoPage() {
   const [error, setError] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
   const [locating, setLocating] = useState(false);
+  const [mapPosition, setMapPosition] = useState<{ latitude: number; longitude: number } | null>(null);
+  const [confirmingPosition, setConfirmingPosition] = useState(false);
 
   function setField(field: keyof AddressForm, value: string) {
     setAddress((current) => ({ ...current, [field]: value }));
@@ -61,6 +69,7 @@ export default function NovoEnderecoPage() {
     setLocating(true);
     navigator.geolocation.getCurrentPosition(
       async ({ coords }) => {
+        setMapPosition({ latitude: coords.latitude, longitude: coords.longitude });
         try {
           const params = new URLSearchParams({
             lat: String(coords.latitude),
@@ -104,6 +113,47 @@ export default function NovoEnderecoPage() {
       },
       { enableHighAccuracy: true, timeout: 12_000, maximumAge: 60_000 },
     );
+  }
+
+  async function confirmMapPosition() {
+    if (!mapPosition) return;
+    setConfirmingPosition(true);
+    setError(null);
+
+    try {
+      const params = new URLSearchParams({
+        lat: String(mapPosition.latitude),
+        lon: String(mapPosition.longitude),
+      });
+      const response = await fetch(`/api/geocode/reverse?${params}`, { cache: "no-store" });
+      const result = await response.json();
+
+      if (!response.ok) {
+        setError(result.error ?? "Não foi possível localizar o endereço selecionado.");
+        return;
+      }
+
+      const found = result.location;
+      setAddress((current) => ({
+        ...current,
+        cep: found.cep ?? "",
+        rua: found.endereco ?? "",
+        numero: found.numero ?? "",
+        bairro: found.bairro ?? "",
+        cidade: found.cidade ?? "",
+        estado: found.estado ?? "",
+        latitude: found.latitude ?? String(mapPosition.latitude),
+        longitude: found.longitude ?? String(mapPosition.longitude),
+      }));
+
+      if (!found.endereco || !found.numero) {
+        setError("Ponto atualizado. Confira a rua e informe o número caso ele não esteja cadastrado no mapa.");
+      }
+    } catch {
+      setError("Não foi possível consultar o endereço selecionado.");
+    } finally {
+      setConfirmingPosition(false);
+    }
   }
 
   async function save() {
@@ -191,6 +241,30 @@ export default function NovoEnderecoPage() {
           )}
           {locating ? "Localizando..." : "Preencher com minha localização"}
         </button>
+
+        {mapPosition && (
+          <div className="mb-5 space-y-3">
+            <div>
+              <p className={labelClass}>Ajuste a localização</p>
+              <p className="mt-1 text-xs text-ink-soft">
+                Mova o mapa até o marcador ficar sobre a entrada da sua casa.
+              </p>
+            </div>
+            <AddressMapPicker
+              latitude={mapPosition.latitude}
+              longitude={mapPosition.longitude}
+              onPositionChange={(latitude, longitude) => setMapPosition({ latitude, longitude })}
+            />
+            <button
+              type="button"
+              onClick={confirmMapPosition}
+              disabled={confirmingPosition}
+              className="w-full rounded-xl bg-primary-500 px-3.5 py-3 text-sm font-semibold text-white disabled:opacity-50"
+            >
+              {confirmingPosition ? "Consultando endereço..." : "Confirmar ponto no mapa"}
+            </button>
+          </div>
+        )}
 
         <div className="grid grid-cols-[1fr_110px] gap-3">
           <div>
