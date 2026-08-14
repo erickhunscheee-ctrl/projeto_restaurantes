@@ -34,7 +34,7 @@ export function AddressMapPicker({
 
     L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png", {
       maxZoom: 19,
-      attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+      attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors · <a href="https://stadiamaps.com/attribution/">Stadia Maps</a>',
     }).addTo(map);
 
     map.on("moveend", () => {

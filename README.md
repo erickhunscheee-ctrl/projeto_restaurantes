@@ -60,6 +60,20 @@ Além de `WHATSAPP_API_URL`, configure `WHATSAPP_API_BASE_URL` com a raiz da API
 sem `/enviar`. Essa URL é usada pelos endpoints de criação, status, reconexão,
 QR Code e remoção das sessões.
 
+## Geocodificação
+
+As telas chamam apenas `/api/geocode/reverse` ou a variante administrativa. O
+provedor é selecionado no servidor com `GEOCODING_PROVIDER=stadiamaps` ou
+`GEOCODING_PROVIDER=nominatim`, sem alteração no frontend.
+
+Para Stadia Maps, configure `STADIA_MAPS_API_KEY`. A chave nunca deve usar o
+prefixo `NEXT_PUBLIC`. A implementação anterior do Nominatim continua
+disponível por `NOMINATIM_BASE_URL` e `GEOCODING_CONTACT_EMAIL`.
+
+O plano gratuito do Stadia Maps serve para testes com armazenamento temporário.
+Antes de persistir resultados geocodificados em produção, confirme o plano e os
+termos de armazenamento vigentes do provedor.
+
 ## Docker / VPS
 
 Com o `.env` preenchido, execute:

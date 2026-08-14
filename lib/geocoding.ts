@@ -1,3 +1,5 @@
+import { reverseGeocodeWithStadiaMaps } from "./geocoding/stadiamaps";
+
 type NominatimAddress = {
   house_number?: string;
   road?: string;
@@ -27,6 +29,11 @@ type NominatimResponse = {
 let lastRequestAt = 0;
 
 export async function reverseGeocode(latitude: number, longitude: number) {
+  const provider = (process.env.GEOCODING_PROVIDER ?? "nominatim").toLowerCase();
+  if (provider === "stadiamaps") {
+    return reverseGeocodeWithStadiaMaps(latitude, longitude);
+  }
+
   if (!Number.isFinite(latitude) || latitude < -90 || latitude > 90 ||
       !Number.isFinite(longitude) || longitude < -180 || longitude > 180) {
     return { status: 400, body: { error: "Coordenadas inválidas." } };
