@@ -4,9 +4,8 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { User } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { createClient } from "@/lib/supabase/client";
 
-export function EditProfileForm({ userId, initialName, phone }: { userId: string; initialName: string; phone: string }) {
+export function EditProfileForm({ initialName, phone }: { initialName: string; phone: string }) {
   const router = useRouter();
   const [name, setName] = useState(initialName);
   const [error, setError] = useState<string | null>(null);
@@ -15,9 +14,10 @@ export function EditProfileForm({ userId, initialName, phone }: { userId: string
   async function save() {
     if (!name.trim()) return setError("Informe seu nome.");
     setSaving(true); setError(null);
-    const { error: updateError } = await createClient().from("profiles").upsert({ id: userId, nome: name.trim(), telefone: phone });
+    const response = await fetch("/api/profile", { method: "PATCH", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ nome: name.trim() }) });
+    const result = await response.json();
     setSaving(false);
-    if (updateError) return setError(updateError.message);
+    if (!response.ok) return setError(result.error ?? "Não foi possível atualizar o perfil.");
     router.push("/perfil");
     router.refresh();
   }

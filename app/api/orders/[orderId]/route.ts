@@ -1,0 +1,3 @@
+import { NextResponse } from "next/server";
+import { requireUser } from "@/lib/user-auth";
+export async function GET(_: Request, { params }: { params: Promise<{ orderId: string }> }) { const context = await requireUser(); if (!context) return NextResponse.json({ error: "Não autenticado." }, { status: 401 }); const { orderId } = await params; const { data, error } = await context.supabase.from("orders").select("*").eq("id", orderId).eq("user_id", context.user.id).maybeSingle(); if (error) return NextResponse.json({ error: error.message }, { status: 400 }); if (!data) return NextResponse.json({ error: "Pedido não encontrado." }, { status: 404 }); return NextResponse.json({ order: data }); }

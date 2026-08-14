@@ -1,31 +1,45 @@
-import { createClient } from "@/lib/supabase/server";
+"use client";
+
+import { use, useEffect, useState } from "react";
 import type { Dish, DishOption, Establishment } from "@/lib/types";
 import { DishCustomizer } from "./dish-customizer";
 
-export default async function PratoPage({
+type DishResponse = {
+  dish: Dish;
+  options: DishOption[];
+  restaurant: Pick<Establishment, "nome"> | null;
+};
+
+export default function PratoPage({
   params,
 }: {
   params: Promise<{ establishmentId: string; dishId: string }>;
 }) {
-  const { establishmentId, dishId } = await params;
-  const supabase = await createClient();
+  const { establishmentId, dishId } = use(params);
+  const [data, setData] = useState<DishResponse | null>();
 
-  const [{ data: dish }, { data: options }, { data: establishment }] = await Promise.all([
-    supabase.from("dishes").select("*").eq("id", dishId).single(),
-    supabase.from("dish_options").select("*").eq("dish_id", dishId),
-    supabase.from("establishments").select("nome").eq("id", establishmentId).single(),
-  ]);
+  useEffect(() => {
+    let active = true;
+    fetch(`/api/restaurants/${establishmentId}/dishes/${dishId}`, { cache: "no-store" })
+      .then(async (response) => response.ok ? response.json() : null)
+      .then((result) => { if (active) setData(result); });
+    return () => { active = false; };
+  }, [dishId, establishmentId]);
 
-  if (!dish) {
+  if (data === undefined) {
+    return <main className="flex flex-1 items-center justify-center text-sm text-ink-soft">Carregando...</main>;
+  }
+
+  if (!data) {
     return <main className="p-6 text-sm text-ink-soft">Prato não encontrado.</main>;
   }
 
   return (
     <DishCustomizer
-      dish={dish as Dish}
-      options={(options ?? []) as DishOption[]}
+      dish={data.dish}
+      options={data.options}
       establishmentId={establishmentId}
-      establishmentNome={(establishment as Establishment | null)?.nome ?? ""}
+      establishmentNome={data.restaurant?.nome ?? ""}
     />
   );
 }

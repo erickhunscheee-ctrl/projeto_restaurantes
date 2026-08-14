@@ -8,6 +8,7 @@
     "start": "next start",
     "lint": "next lint",
     "typecheck": "tsc --noEmit",
+    "types:supabase": "node --env-file=.env scripts/generate-supabase-types.mjs",
     "seed": "node scripts/seed.mjs"
   },
   "dependencies": {

@@ -6,7 +6,6 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { ArrowLeft, Check, LoaderCircle, LocateFixed } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { createClient } from "@/lib/supabase/client";
 
 const emptyAddress = {
   cep: "",
@@ -172,19 +171,7 @@ export default function NovoEnderecoPage() {
     const formattedAddress = formatAddress(address);
     setSaving(true);
     setError(null);
-    const supabase = createClient();
-    const {
-      data: { user },
-    } = await supabase.auth.getUser();
-
-    if (!user) {
-      setSaving(false);
-      router.replace("/login");
-      return;
-    }
-
-    const { error: insertError } = await supabase.from("addresses").insert({
-      user_id: user.id,
+    const response = await fetch("/api/addresses", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({
       rotulo: label.trim(),
       endereco: formattedAddress,
       padrao: isDefault,
@@ -197,11 +184,13 @@ export default function NovoEnderecoPage() {
       estado: address.estado.trim().toUpperCase(),
       latitude: address.latitude ? Number(address.latitude) : null,
       longitude: address.longitude ? Number(address.longitude) : null,
-    });
+    }) });
+    const result = await response.json();
 
     setSaving(false);
-    if (insertError) {
-      setError(insertError.message);
+    if (!response.ok) {
+      if (response.status === 401) return router.replace("/login");
+      setError(result.error ?? "Não foi possível salvar o endereço.");
       return;
     }
 

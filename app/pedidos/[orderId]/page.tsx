@@ -2,7 +2,6 @@
 
 import { use, useEffect, useState } from "react";
 import { Check, MessageCircle } from "lucide-react";
-import { createClient } from "@/lib/supabase/client";
 import { formatBRL } from "@/lib/utils";
 import type { Order, OrderStatus } from "@/lib/types";
 
@@ -18,24 +17,20 @@ export default function PedidoPage({ params }: { params: Promise<{ orderId: stri
   const [order, setOrder] = useState<Order | null>(null);
 
   useEffect(() => {
-    const supabase = createClient();
+    let active = true;
 
-    supabase.from("orders").select("*").eq("id", orderId).single().then(({ data }) => {
-      if (data) setOrder(data as Order);
-    });
+    async function loadOrder() {
+      const response = await fetch(`/api/orders/${orderId}`, { cache: "no-store" });
+      if (!active || !response.ok) return;
+      const data = (await response.json()) as { order: Order };
+      setOrder(data.order);
+    }
 
-    // Realtime: a linha do tempo atualiza sozinha quando o restaurante muda o status.
-    const channel = supabase
-      .channel(`order-${orderId}`)
-      .on(
-        "postgres_changes",
-        { event: "UPDATE", schema: "public", table: "orders", filter: `id=eq.${orderId}` },
-        (payload) => setOrder(payload.new as Order)
-      )
-      .subscribe();
-
+    void loadOrder();
+    const interval = window.setInterval(loadOrder, 5000);
     return () => {
-      supabase.removeChannel(channel);
+      active = false;
+      window.clearInterval(interval);
     };
   }, [orderId]);
 

@@ -1,10 +1,12 @@
+"use client";
+
 import Link from "next/link";
-import { redirect } from "next/navigation";
+import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 import {
   ArrowLeft, Bell, Building2, Check, ChevronRight,
   CreditCard, Home, Pencil, Plus, Receipt,
 } from "lucide-react";
-import { createClient } from "@/lib/supabase/server";
 import type { Address, Profile } from "@/lib/types";
 import { LogoutButton, NotificationToggle } from "./profile-actions";
 import { BottomNavbar } from "@/components/bottom-navbar";
@@ -20,26 +22,12 @@ function phone(value: string | null) {
   return value || "Telefone não informado";
 }
 
-export default async function PerfilPage() {
-  const supabase = await createClient();
-  const { data: { user } } = await supabase.auth.getUser();
-  if (!user) redirect("/login");
-
-  const [{ data: profileData }, { data: addressData }, { count }] = await Promise.all([
-    supabase.from("profiles").select("id,nome,telefone,endereco_padrao,notificacoes_ativas").eq("id", user.id).maybeSingle(),
-    supabase.from("addresses").select("*").eq("user_id", user.id).order("padrao", { ascending: false }).order("criado_em"),
-    supabase.from("orders").select("id", { count: "exact", head: true }).eq("user_id", user.id),
-  ]);
-
-  const profile = (profileData ?? {
-    id: user.id,
-    nome: user.user_metadata?.nome ?? "Meu perfil",
-    telefone: user.phone ?? null,
-    endereco_padrao: null,
-    notificacoes_ativas: true,
-  }) as Profile;
-  const addresses = (addressData ?? []) as Address[];
-  const totalOrders = count ?? 0;
+export default function PerfilPage() {
+  const router = useRouter();
+  const [data, setData] = useState<{ profile: Profile; addresses: Address[]; totalOrders: number } | null>(null);
+  useEffect(() => { fetch("/api/profile", { cache: "no-store" }).then(async (response) => { if (response.status === 401) { router.replace("/login"); return null; } return response.ok ? response.json() : null; }).then((result) => { if (result) setData(result); }); }, [router]);
+  if (!data) return <main className="flex flex-1 items-center justify-center text-sm text-ink-soft">Carregando...</main>;
+  const { profile, addresses, totalOrders } = data;
 
   return (
     <main className="flex min-h-0 flex-1 flex-col">
@@ -54,7 +42,7 @@ export default async function PerfilPage() {
             {initials(profile.nome)}
           </div>
           <p className="mt-2.5 text-base font-medium">{profile.nome}</p>
-          <p className="mt-0.5 text-xs text-ink-soft">{phone(profile.telefone ?? user.phone ?? null)}</p>
+          <p className="mt-0.5 text-xs text-ink-soft">{phone(profile.telefone ?? null)}</p>
           <Link href="/perfil/editar" className="mt-2 flex items-center gap-1 text-xs font-medium text-red-dark">
             <Pencil size={13} /> editar perfil
           </Link>
@@ -100,7 +88,7 @@ export default async function PerfilPage() {
           <div className="overflow-hidden rounded-xl border border-border">
             <div className="flex items-center justify-between border-b border-border px-3.5 py-3">
               <span className="flex items-center gap-2.5 text-[13px]"><Bell size={17} className="text-ink-soft" /> Notificações</span>
-              <NotificationToggle userId={user.id} initialValue={profile.notificacoes_ativas} />
+              <NotificationToggle initialValue={profile.notificacoes_ativas} />
             </div>
             <Link href="/perfil/pagamento" className="flex items-center justify-between px-3.5 py-3">
               <span className="flex items-center gap-2.5 text-[13px]"><CreditCard size={17} className="text-ink-soft" /> Formas de pagamento</span>

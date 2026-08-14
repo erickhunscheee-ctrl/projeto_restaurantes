@@ -3,7 +3,6 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
-import { createClient } from "@/lib/supabase/client";
 
 export default function AdminLoginPage() {
   const router = useRouter();
@@ -17,8 +16,6 @@ export default function AdminLoginPage() {
     const response = await fetch("/api/admin/login", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ username, password }) });
     const result = await response.json();
     if (!response.ok) { setLoading(false); return setError(result.error ?? "Não foi possível entrar."); }
-    const { error: sessionError } = await createClient().auth.setSession(result.session);
-    if (sessionError) { setLoading(false); return setError(sessionError.message); }
     router.push("/admin/restaurantes");
   }
 

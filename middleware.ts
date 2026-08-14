@@ -24,7 +24,10 @@ export async function middleware(request: NextRequest) {
       return NextResponse.redirect(new URL("/restaurantes", request.url));
     }
   }
+  if (request.nextUrl.pathname.startsWith("/restaurante") && !request.nextUrl.pathname.startsWith("/restaurante/login")) {
+    if (!user) return NextResponse.redirect(new URL("/restaurante/login", request.url));
+  }
   return response;
 }
 
-export const config = { matcher: ["/admin/:path*"] };
+export const config = { matcher: ["/admin/:path*", "/restaurante/:path*"] };

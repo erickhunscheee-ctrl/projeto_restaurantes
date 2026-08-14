@@ -1,0 +1,3 @@
+import { NextResponse } from "next/server";
+import { createClient } from "@/lib/supabase/server";
+export async function GET(_: Request, { params }: { params: Promise<{ establishmentId: string }> }) { const { establishmentId } = await params; const supabase = await createClient(); const [{ data: restaurant }, { data: dishes }] = await Promise.all([supabase.from("establishments").select("*").eq("id", establishmentId).maybeSingle(), supabase.from("dishes").select("*").eq("establishment_id", establishmentId).eq("disponivel_hoje", true)]); if (!restaurant) return NextResponse.json({ error: "Restaurante não encontrado." }, { status: 404 }); return NextResponse.json({ restaurant, dishes: dishes ?? [] }); }

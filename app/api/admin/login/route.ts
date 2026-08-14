@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { createClient as createAdminClient } from "@supabase/supabase-js";
+import { createClient as createSessionClient } from "@/lib/supabase/server";
 
 export async function POST(request: Request) {
   const body = await request.json();
@@ -28,7 +29,8 @@ export async function POST(request: Request) {
     user = data.user;
   }
 
-  const { data: session, error: sessionError } = await admin.auth.signInWithPassword({ email, password });
+  const sessionClient = await createSessionClient();
+  const { data: session, error: sessionError } = await sessionClient.auth.signInWithPassword({ email, password });
   if (sessionError || !session.session) return NextResponse.json({ error: "Não foi possível iniciar a sessão." }, { status: 500 });
-  return NextResponse.json({ session: session.session });
+  return NextResponse.json({ ok: true });
 }

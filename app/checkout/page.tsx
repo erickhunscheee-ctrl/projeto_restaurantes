@@ -6,7 +6,6 @@ import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { DishIcon } from "@/components/ui/dish-icon";
 import { useCartStore } from "@/lib/store/cart";
-import { createClient } from "@/lib/supabase/client";
 import { formatBRL } from "@/lib/utils";
 import Link from "next/link";
 
@@ -22,17 +21,7 @@ export default function CheckoutPage() {
   const total = subtotal() + TAXA_ENTREGA;
 
   useEffect(() => {
-    const supabase = createClient();
-    supabase.auth.getUser().then(async ({ data }) => {
-      if (!data.user) return;
-      const { data: address } = await supabase
-        .from("addresses")
-        .select("endereco")
-        .eq("user_id", data.user.id)
-        .eq("padrao", true)
-        .maybeSingle();
-      setEndereco(address?.endereco ?? null);
-    });
+    fetch("/api/address", { cache: "no-store" }).then((response) => response.ok ? response.json() : null).then((result) => setEndereco(result?.address?.endereco ?? null));
   }, []);
 
   async function confirmarPedido() {
@@ -40,65 +29,18 @@ export default function CheckoutPage() {
     setEnviando(true);
     setErro(null);
 
-    const supabase = createClient();
-    const { data: userData } = await supabase.auth.getUser();
-    if (!userData.user) {
-      router.push("/login");
-      return;
-    }
-
-    const { data: address } = await supabase
-      .from("addresses")
-      .select("endereco")
-      .eq("user_id", userData.user.id)
-      .eq("padrao", true)
-      .maybeSingle();
-
-    if (!address?.endereco) {
-      setEnviando(false);
-      router.push("/perfil/enderecos/novo");
-      return;
-    }
-
-    const { data: order, error } = await supabase
-      .from("orders")
-      .insert({
-        user_id: userData.user.id,
-        establishment_id: establishmentId,
-        endereco_entrega: address.endereco,
-        forma_pagamento: "pix",
-        subtotal: subtotal(),
-        taxa_entrega: TAXA_ENTREGA,
-        total,
-      })
-      .select()
-      .single();
-
-    if (error || !order) {
-      setEnviando(false);
-      setErro(error?.message ?? "Não foi possível criar o pedido.");
-      return;
-    }
-
-    const { error: itemsError } = await supabase.from("order_items").insert(
-      items.map((item) => ({
-        order_id: order.id,
-        dish_id: item.dish_id,
-        quantidade: item.quantidade,
-        opcoes_selecionadas: item.opcoes_selecionadas,
-        observacoes: item.observacoes || null,
-        preco_unitario: item.preco_unitario,
-      }))
-    );
-
+    const response = await fetch("/api/orders", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ establishment_id: establishmentId, items }) });
+    const result = await response.json();
     setEnviando(false);
-    if (itemsError) {
-      setErro(itemsError.message);
+    if (!response.ok) {
+      if (response.status === 401) return router.push("/login");
+      if (result.code === "address_required") return router.push("/perfil/enderecos/novo");
+      setErro(result.error ?? "Não foi possível criar o pedido.");
       return;
     }
 
     clear();
-    router.push(`/pedidos/${order.id}`);
+    router.push(`/pedidos/${result.order.id}`);
   }
 
   if (items.length === 0) {

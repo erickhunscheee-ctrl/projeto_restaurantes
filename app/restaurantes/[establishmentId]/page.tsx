@@ -1,35 +1,40 @@
+"use client";
+
 import { ArrowLeft, Heart, Clock, ImageIcon } from "lucide-react";
 import Link from "next/link";
-import { createClient } from "@/lib/supabase/server";
+import { use, useEffect, useState } from "react";
 import { DishIcon } from "@/components/ui/dish-icon";
 import { formatBRL } from "@/lib/utils";
 import { AddDishButton } from "./add-dish-button";
 import { CartBar } from "./cart-bar";
 import type { Dish, Establishment } from "@/lib/types";
 
-export default async function CardapioPage({
+export default function CardapioPage({
   params,
 }: {
   params: Promise<{ establishmentId: string }>;
 }) {
-  const { establishmentId } = await params;
-  const supabase = await createClient();
+  const { establishmentId } = use(params);
+  const [data, setData] = useState<{ restaurant: Establishment; dishes: Dish[] } | null>();
 
-  const [{ data: establishment }, { data: dishes }] = await Promise.all([
-    supabase.from("establishments").select("*").eq("id", establishmentId).single(),
-    supabase
-      .from("dishes")
-      .select("*")
-      .eq("establishment_id", establishmentId)
-      .eq("disponivel_hoje", true),
-  ]);
+  useEffect(() => {
+    let active = true;
+    fetch(`/api/restaurants/${establishmentId}`, { cache: "no-store" })
+      .then(async (response) => response.ok ? response.json() : null)
+      .then((result) => { if (active) setData(result); });
+    return () => { active = false; };
+  }, [establishmentId]);
 
-  const r = establishment as Establishment | null;
-  const pratos = (dishes ?? []) as Dish[];
+  if (data === undefined) {
+    return <main className="flex flex-1 items-center justify-center text-sm text-ink-soft">Carregando...</main>;
+  }
 
-  if (!r) {
+  if (!data) {
     return <main className="p-6 text-sm text-ink-soft">Restaurante não encontrado.</main>;
   }
+
+  const r = data.restaurant;
+  const pratos = data.dishes;
 
   return (
     <main className="flex flex-1 flex-col">

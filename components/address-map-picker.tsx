@@ -51,11 +51,20 @@ export function AddressMapPicker({
     };
   }, []);
 
+  useEffect(() => {
+    const map = mapRef.current;
+    if (!map) return;
+    const center = map.getCenter();
+    if (Math.abs(center.lat - latitude) > 0.000001 || Math.abs(center.lng - longitude) > 0.000001) {
+      map.setView([latitude, longitude], map.getZoom(), { animate: false });
+    }
+  }, [latitude, longitude]);
+
   return (
     <div className="relative overflow-hidden rounded-2xl border border-border-strong">
       <div
         ref={containerRef}
-        className="h-64 w-full"
+        className="h-64 w-full sm:h-80"
         aria-label="Mapa para ajustar a localização do endereço"
       />
       <div className="pointer-events-none absolute left-1/2 top-1/2 z-[500] -translate-x-1/2 -translate-y-full">

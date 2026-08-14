@@ -3,7 +3,6 @@
 import { use, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
-import { createClient } from "@/lib/supabase/client";
 
 export default function ConfirmarLoginPage({
   searchParams,
@@ -26,26 +25,14 @@ export default function ConfirmarLoginPage({
     });
     const result = await response.json();
 
-    if (!response.ok || !result.session) {
+    if (!response.ok) {
       setLoading(false);
       setErro(result.error ?? "Código inválido.");
       return;
     }
 
-    const supabase = createClient();
-    const { error: sessionError } = await supabase.auth.setSession(result.session);
-    if (sessionError) {
-      setLoading(false);
-      setErro(sessionError.message);
-      return;
-    }
-
     // Garante que o perfil (nome + telefone) existe na tabela `profiles`.
-    await supabase.from("profiles").upsert({
-      id: result.userId,
-      nome,
-      telefone,
-    });
+    await fetch("/api/profile", { method: "PATCH", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ nome, telefone }) });
 
     setLoading(false);
     router.push("/restaurantes");

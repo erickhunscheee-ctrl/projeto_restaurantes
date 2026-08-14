@@ -10,6 +10,7 @@ export type Establishment = {
   foto_url: string | null;
   avatar_iniciais: string | null;
   avatar_cor: string | null;
+  whatsapp_telefone?: string | null;
 };
 
 export type Category = {
@@ -81,6 +82,7 @@ export type Profile = {
   telefone: string | null;
   endereco_padrao: string | null;
   notificacoes_ativas: boolean;
+  role?: "cliente" | "restaurante";
 };
 
 export type Address = {

@@ -3,9 +3,8 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { LogOut } from "lucide-react";
-import { createClient } from "@/lib/supabase/client";
 
-export function NotificationToggle({ userId, initialValue }: { userId: string; initialValue: boolean }) {
+export function NotificationToggle({ initialValue }: { initialValue: boolean }) {
   const [active, setActive] = useState(initialValue);
   const [saving, setSaving] = useState(false);
 
@@ -14,11 +13,8 @@ export function NotificationToggle({ userId, initialValue }: { userId: string; i
     const next = !active;
     setActive(next);
     setSaving(true);
-    const { error } = await createClient()
-      .from("profiles")
-      .update({ notificacoes_ativas: next })
-      .eq("id", userId);
-    if (error) setActive(!next);
+    const response = await fetch("/api/profile", { method: "PATCH", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ notificacoes_ativas: next }) });
+    if (!response.ok) setActive(!next);
     setSaving(false);
   }
 
@@ -43,7 +39,7 @@ export function LogoutButton() {
 
   async function logout() {
     setLoading(true);
-    await createClient().auth.signOut();
+    await fetch("/api/auth/logout", { method: "POST" });
     router.replace("/login");
     router.refresh();
   }
